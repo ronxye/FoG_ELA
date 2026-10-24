@@ -10,32 +10,6 @@ This package contains the analysis and plotting code supplied with the manuscrip
 
 Install the Python packages with `python -m pip install -r requirements.txt`.
 
-## Data and output locations
-
-Paths are defined relative to this folder in `submission_config.py` and `submission_paths.m`. Inputs are read from `data/` and results are written to `results/`. Both languages accept the optional environment variables `ELA_DATA_DIR` and `ELA_RESULTS_DIR`. Sequence scripts additionally accept `ELA_BN_DIR`, which selects one group-specific folder of state sequences.
-
-```
-data/
-  cross_sectional_metrics.csv
-  treatment_metrics.csv
-  fnirs_clinical.xlsx
-  state_sequences/          # anonymized *_BN.csv files, one column without a header
-  fnirs_task/              # anonymized P001.nirs, P002.nirs, ...
-  fnirs_rest/              # matching P001.nirs, P002.nirs, ...
-  energy_model/
-    empirical_probabilities_result.mat
-    model_probabilities_result.mat
-    model_probabilities_HC.mat
-    model_probabilities_PD_noFOG.mat
-    model_probabilities_PD_FOG.mat
-```
-
-Input column names remain case-sensitive and unchanged from the analysis scripts. Required column lists are provided in `input_columns.json`.
-
-`cross_sectional_metrics.csv` uses `group` values `FOG`, `noFOG`, and `HC`. `treatment_metrics.csv` uses `group` values 1 for responders and 2 for non-responders. Improvement-rate input columns contain proportions; the behavioral-correlation script converts them to percentages for plotting. Change-score input columns retain their original definitions; pre/post mean changes are calculated as post minus pre.
-
-The fNIRS clinical spreadsheet uses `Sheet1`, an anonymous `Subject_ID`, `sex`, `age`, `education`, `MoCA-pre`, `TF%`, and `Mean_Freezing_Duration_s`. Names, birth dates, and other direct identifiers are unnecessary. fNIRS task and rest files must have identical anonymous basenames, which also match `Subject_ID` in the spreadsheet. Replace identifiers consistently before running; the scripts do not anonymize the source dataset. Name-based and file-order matching have been replaced by exact anonymous-ID matching.
-
 ## Analyses and execution
 
 Run each Python script as `python <script_name>.py`. Run MATLAB scripts from their containing folder or add this folder to the MATLAB path. The two original Live Scripts are supplied as ordinary `.m` files containing their executable code, without embedded outputs or metadata.
@@ -57,7 +31,7 @@ Run each Python script as `python <script_name>.py`. Run MATLAB scripts from the
 
 Run `analyze_fnirs_state_dynamics.m` before `correlate_fnirs_freezing.py`; the latter reads its current participant-level CSV and target-pattern definitions from `results/fnirs_state_dynamics/`. The `.nirs` files must contain the preprocessed `procResult.dc` HbO data and, for task files, the four-column marker matrix `s`. Channels, network order, 11-Hz sampling, 14 target patterns, first-three-trial policy, complete 10-s window rule, segment-boundary truncation, zero dwell time for no-state segments, and equal trial weighting are retained from the source analysis.
 
-## Statistical settings retained from the supplied code
+## Statistical settings
 
 - Three-group ELA/global ANCOVA: age, sex, education, mean FD. PD-only contrasts additionally include disease duration, LEDD, and HY. ELA sensitivity models additionally include UPDRS III.
 - ELA Bonferroni families: 10 omnibus tests, 30 pairwise contrasts, and a separate 10-test UPDRS III sensitivity family.
@@ -74,7 +48,3 @@ Run `analyze_fnirs_state_dynamics.m` before `correlate_fnirs_freezing.py`; the l
 The two sequence scripts retain the mapping executed in the supplied code: 1 → Minor state 1; 2 and 4 → Major state 1; 3 and 5 → Major state 2; 6 → Minor state 2. Basin labels depend on the fitted landscape; align this mapping with the basin assignments for the input group before processing another landscape. The contradictory example/comment mapping in the original duration script is not included. Changing this mapping changes the analysis.
 
 Probability MAT files provide `empirical_probabilities` or `model_probabilities`. Group model MAT files provide an energy vector `E` in a consistent state order across groups. Their correlations and probability-fit statistics are uncorrected, as in the supplied code.
-
-## Source correspondence
-
-`script_manifest.json` maps original filenames to the submission filenames and records source and submission SHA-256 hashes. Original files are unchanged. The package was prepared through static source review; analyses were not rerun during packaging, and MATLAB execution was not performed.
